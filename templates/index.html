@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zen Word Solver</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    font-size: 18px;
+    background: linear-gradient(135deg, #3b7d3f 0%, #66a96b 50%, #8bcf90 100%);
+    background-attachment: fixed;
+    color: #333;
+}
+
+.container {
+    max-width: 480px;
+    margin: 20px auto;
+    background-color: rgba(255,255,255,0.94);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 10px;
+    color: rgb(110, 108, 108);
+    margin-bottom: 6px;
+    user-select: none;
+}
+
+h1 {
+    font-size: 2em;
+    text-align: center;
+    margin-top: 0;
+}
+
+label {
+    font-weight: bold;
+}
+
+input, button {
+    padding: 12px;
+    margin: 6px 0;
+    font-size: 18px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#solve_button {
+    background-color: #4CAF50;
+}
+
+#clear_button {
+    background-color: #428bfa;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+#slider_val {
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+#words {
+    margin-top: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px;
+
+    column-count: 3;
+    column-gap: 12px;
+}
+
+.word-item {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    margin-bottom: 8px;
+
+    background-color: rgba(255,255,255,0.9);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    text-transform: uppercase;
+
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.word-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0,0,0,0.25);
+}
+
+.word-item.new {
+    background-color: #fffa8c;
+}
+
+@media (max-width: 480px) {
+    body { font-size: 20px; }
+    input, button { font-size: 20px; padding: 14px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="subtitle">
+© designed specifically for "Легенда номер 17" team
+</div>
+
+<h1>Zen Word Solver</h1>
+
+<label for="letters">Комбинация букв</label>
+<input type="text" id="letters" maxlength="7"
+       placeholder="Введите буквы"
+       autocomplete="off" autocorrect="off"
+       spellcheck="false">
+
+<label for="min_length_slider">
+    Мин. длина: <span id="slider_val">3</span>
+</label>
+<input type="range" id="min_length_slider" min="3" max="7" value="3"
+       oninput="updateSliderVal()">
+
+<button id="solve_button" onclick="solve()">Найти слова</button>
+<button id="clear_button" onclick="clearWords()">Новая комбинация</button>
+
+<h3>Слова:</h3>
+<div id="words"></div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</div>
+</body>
+</html>
