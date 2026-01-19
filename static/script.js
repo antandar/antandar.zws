@@ -1,79 +1,78 @@
-let previousWords = new Set();
-
-// Поле ввода букв — только русские, верхний регистр
 const lettersInput = document.getElementById("letters");
+const hide3Checkbox = document.getElementById("hide_3_letters");
+
+// Только русские буквы + CAPS
 lettersInput.addEventListener("input", () => {
-    const cursor = lettersInput.selectionStart;
+    const pos = lettersInput.selectionStart;
     lettersInput.value = lettersInput.value
-        .toUpperCase()
-        .replace(/[^А-ЯЁ]/g, "");
-    lettersInput.setSelectionRange(cursor, cursor);
+        .replace(/[^а-яё]/gi, "")
+        .toUpperCase();
+    lettersInput.setSelectionRange(pos, pos);
 });
 
-function updateSliderVal() {
-    document.getElementById("slider_val").textContent =
-        document.getElementById("min_length_slider").value;
-}
+// Enter — поиск
+lettersInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") solve();
+});
 
 function solve() {
-    const letters = lettersInput.value;
-    const min_length = document.getElementById("min_length_slider").value;
-
+    const letters = lettersInput.value.toLowerCase();
     if (!letters) return;
 
     fetch("/solve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ letters, min_length })
+        body: JSON.stringify({
+            letters,
+            min_length: hide3Checkbox.checked ? 4 : 3
+        })
     })
     .then(res => res.json())
     .then(words => {
         const div = document.getElementById("words");
+        const hadWords = div.children.length > 0;
+
         div.innerHTML = "";
 
         words.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
-        words.forEach((w, index) => {
+        words.forEach((w, i) => {
             const item = document.createElement("div");
-            item.className = "word-item";
+            item.className = `word-item word-len-${w.length}`;
             item.textContent = w.toUpperCase();
+            item.style.animationDelay = `${i * 0.02}s`;
+            item.onclick = () => navigator.clipboard.writeText(w);
 
-            if (!previousWords.has(w)) {
-                item.classList.add("new");
-            }
-
-            item.onclick = () => copyWord(w);
             div.appendChild(item);
         });
 
-        previousWords = new Set(words);
-
-        // прокрутка вниз (для column-count)
-        setTimeout(() => {
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: "smooth"
-            });
-        }, 200);
+        if (words.length && !hadWords) {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: "smooth"
+                });
+            }, 200);
+        }
     });
-}
-
-function copyWord(word) {
-    navigator.clipboard.writeText(word);
 }
 
 function clearWords() {
     document.getElementById("words").innerHTML = "";
     lettersInput.value = "";
-    previousWords.clear();
     lettersInput.focus();
 }
 
 // Горячие клавиши
-lettersInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") solve();
-});
-
 document.addEventListener("keydown", e => {
     if (e.key === "Delete") clearWords();
+    if (e.key === "3") {
+        hide3Checkbox.checked = !hide3Checkbox.checked;
+        if (lettersInput.value.trim()) solve();
+    }
+});
+
+// Автофильтр
+hide3Checkbox.addEventListener("change", () => {
+    if (lettersInput.value.trim()) solve();
 });
