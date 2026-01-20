@@ -87,11 +87,10 @@ button.secondary {
 .word-item {
     display: inline-block;
     width: 100%;
-    break-inside: avoid;
+    max-width: 110px;      /* ключевой момент */
+    margin: 0 auto 10px;   /* центр в колонке */
 
-    margin-bottom: 10px;
-    padding: 10px;
-
+    padding: 8px 6px;      /* уже по горизонтали */
     text-align: center;
     font-weight: bold;
 
